@@ -1,0 +1,45 @@
+{{#def.Header}}
+<div class="uk-overflow-container">
+    <h3>Strike a Rod</h3>
+    <form class="uk-form">
+        <select id="rod" OnChange="DRApp.current.controller.pick()">
+            <option value="">Pick a Rod</option>
+{{~it.rods :rod}}
+            <option value="{{!rod.id}}" {{? it.rod && it.rod.id == rod.id }}selected{{?}}>{{!rod.name}}</option>
+{{~}}
+        </select>
+{{? it.rod }}
+    {{~it.inputs :input}}
+        <input id="input__{{!input.name}}" placeholder="{{!input.name}}" type="text"/>
+    {{~}}
+        <input id="entity_id" value="{{!it.entity_id}}" placeholder="Who (entity id)" type="text"/>
+        <button type="button" OnClick="DRApp.current.controller.strike();" class="uk-button uk-button-primary">
+            Strike
+        </button>
+{{?}}
+    </form>
+    <h3>Open Strikes</h3>
+    <table class="uk-table">
+        <thead>
+            <tr>
+                <th>Strike</th>
+                <th>State</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+{{~it.strikes :strike}}
+            <tr>
+                <td>{{!strike.description}}</td>
+                <td>{{!strike.state}}</td>
+                <td>
+                    <button type="button" OnClick="DRApp.current.controller.advance('{{!strike.id}}');" class="uk-button uk-button-primary">
+                        {{? strike.state == 'created' }}Start{{??}}Done{{?}}
+                    </button>
+                </td>
+            </tr>
+{{~}}
+        </tbody>
+    </table>
+</div>
+{{#def.Footer}}

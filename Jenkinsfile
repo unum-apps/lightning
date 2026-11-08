@@ -49,6 +49,13 @@ pipeline {
                                 }
                             }
                         }
+                        stage('test') {
+                            steps {
+                                dir('gui') {
+                                    sh 'make test'
+                                }
+                            }
+                        }
                     }
                 }
             }
