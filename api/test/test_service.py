@@ -19,7 +19,12 @@ if not sys.warnoptions:
     import warnings
     warnings.simplefilter("ignore")
 
-MODELS = ["Journal", "Sequence", "Slug"]
+MODELS = [
+    "Bolt", "Forecast", "ForecastScat", "Journal", "Rod", "Sequence", "Slug", "Strike", "StrikeScat"
+]
+
+OWNER = "gaf-unifist:entity.cumulus:test"
+SCAT = "1:scat.cumulus:test"
 
 SECRET = '{"host": "%s", "user": "root", "password": ""}' % os.environ["MYSQL_HOST"]
 CONFIG = '{"unum": "test", "local": "lightning-test", "cert": ["/certs/client/tls.crt", "/certs/client/tls.key"], "verify": "/certs/roots/ca.crt"}'
@@ -50,7 +55,9 @@ class Testrestx(relations.unittest.TestCase):
         for source in by_name.values():
             source.connection.cursor().execute(f"CREATE DATABASE IF NOT EXISTS `{source.schema}`")
 
-        # Lightning has no tables of its own yet, so there is no DDL to load into the DB source behind the routed one
+        # Lightning's own tables come from its DDL, on the real DB source behind the routed one
+
+        by_name["lightning-test"].load("ddl/lightning/mysql/definition.sql")
 
         # The unifist and unum tables belong to unifist-unum, so they're made from the base models, not from DDL here
 
@@ -215,9 +222,116 @@ class TestModelAPI(Testrestx):
             self.assertEqual(response.status_code, 200, model["singular"])
             self.assertEqual(response.json[model["plural"]], [], model["singular"])
 
-    def test_journal(self):
+    def create(self, singular, body, plural=None):
+        """
+        Creates a record and gives back what the API says it is
+        """
 
-        response = self.api.get("/model/journal")
+        response = self.api.post(f"/model/{singular}", json={singular: body})
+
+        self.assertEqual(response.status_code, 201, response.json)
+
+        return response.json[singular]
+
+    def test_bolt(self):
+
+        # A Bolt is an ongoing effort, with a slug (its id), a name and a description, and it can be part of another
+        # Bolt or come from one
+
+        parent = self.create("bolt", {"entity_id": OWNER, "name": "Eat well", "description": "Cook at home"})
+
+        self.assertEqual(parent["id"], "eat-well:bolt.lightning:test")
+        self.assertEqual(parent["entity_id"], OWNER)
+        self.assertEqual(parent["home"], "test")
+
+        part = self.create("bolt", {"entity_id": OWNER, "name": "Dinner plan", "description": "Plan dinners", "part_of_id": parent["id"]})
+        offshoot = self.create("bolt", {"entity_id": OWNER, "name": "Bulk buying", "description": "Buy in bulk", "from_id": parent["id"]})
+
+        response = self.api.get(f"/model/bolt/{part['id']}")
 
         self.assertEqual(response.status_code, 200, response.json)
-        self.assertEqual(response.json["journals"], [])
+        self.assertEqual(response.json["bolt"]["part_of_id"], parent["id"])
+
+        response = self.api.get(f"/model/bolt/{offshoot['id']}")
+
+        self.assertEqual(response.status_code, 200, response.json)
+        self.assertEqual(response.json["bolt"]["from_id"], parent["id"])
+
+    def test_strike(self):
+
+        # A Strike is a todo, created until it is worked and done at the end, and it can come from a Bolt and a Rod
+
+        bolt = self.create("bolt", {"entity_id": OWNER, "name": "Eat well", "description": "Cook at home"})
+        rod = self.create("rod", {"entity_id": OWNER, "name": "Shop at", "input": {"location": "Shaws"}})
+
+        strike = self.create("strike", {
+            "entity_id": OWNER,
+            "description": "Shaws run",
+            "bolt_id": bolt["id"],
+            "rod_id": rod["id"]
+        })
+
+        self.assertEqual(strike["id"], "1:strike.lightning:test")
+        self.assertEqual(strike["state"], "created")
+        self.assertEqual(strike["bolt_id"], bolt["id"])
+        self.assertEqual(strike["rod_id"], rod["id"])
+
+        response = self.api.patch(f"/model/strike/{strike['id']}", json={"strike": {"state": "done"}})
+
+        self.assertEqual(response.status_code, 202, response.json)
+        self.assertEqual(response.json["updated"], 1)
+
+        response = self.api.get(f"/model/strike/{strike['id']}")
+
+        self.assertEqual(response.json["strike"]["state"], "done")
+
+        # A Strike is tied to the Scats it will flush, which Cumulus owns
+
+        tie = self.create("strike_scat", {"strike_id": strike["id"], "scat_id": SCAT})
+
+        self.assertEqual(tie["scat_id"], SCAT)
+
+        response = self.api.get("/model/strike_scat", query_string={"strike_id": strike["id"]})
+
+        self.assertEqual([found["scat_id"] for found in response.json["strike_scats"]], [SCAT])
+
+    def test_rod(self):
+
+        # A Rod is a stored selection and an action, with the inputs it takes, and its id is the slug of its name
+
+        rod = self.create("rod", {
+            "entity_id": OWNER,
+            "name": "Shop at",
+            "selection": {"kind": "grocery"},
+            "act": {"flush": True},
+            "input": {"location": "str"}
+        })
+
+        self.assertEqual(rod["id"], "shop-at:rod.lightning:test")
+        self.assertEqual(rod["selection"], {"kind": "grocery"})
+        self.assertEqual(rod["act"], {"flush": True})
+        self.assertEqual(rod["input"], {"location": "str"})
+
+    def test_forecast(self):
+
+        # A Forecast is an expectation, optionally tied to a Bolt, and the Scats that violate it
+
+        bolt = self.create("bolt", {"entity_id": OWNER, "name": "Eat well", "description": "Cook at home"})
+
+        forecast = self.create("forecast", {
+            "entity_id": OWNER,
+            "name": "Groceries in ten days",
+            "description": "Needed in the next ten days",
+            "bolt_id": bolt["id"]
+        })
+
+        self.assertEqual(forecast["id"], "groceries-in-ten-days:forecast.lightning:test")
+        self.assertEqual(forecast["bolt_id"], bolt["id"])
+
+        tie = self.create("forecast_scat", {"forecast_id": forecast["id"], "scat_id": SCAT})
+
+        self.assertEqual(tie["scat_id"], SCAT)
+
+        response = self.api.get("/model/forecast_scat", query_string={"forecast_id": forecast["id"]})
+
+        self.assertEqual([found["scat_id"] for found in response.json["forecast_scats"]], [SCAT])

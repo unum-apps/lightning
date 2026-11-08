@@ -1,1 +1,398 @@
-{}
+{
+    "bolt": {
+        "fields": [
+            {
+                "auto": false,
+                "kind": "str",
+                "name": "id",
+                "none": false,
+                "readonly": true,
+                "store": "id"
+            },
+            {
+                "default": 1,
+                "kind": "int",
+                "name": "version",
+                "none": false,
+                "store": "version"
+            },
+            {
+                "kind": "str",
+                "name": "home",
+                "none": false,
+                "store": "home"
+            },
+            {
+                "kind": "str",
+                "name": "entity_id",
+                "none": true,
+                "store": "entity_id"
+            },
+            {
+                "kind": "str",
+                "name": "name",
+                "none": true,
+                "store": "name"
+            },
+            {
+                "kind": "str",
+                "name": "description",
+                "none": true,
+                "store": "description"
+            },
+            {
+                "kind": "dict",
+                "name": "what",
+                "none": false,
+                "store": "what"
+            },
+            {
+                "inject": "what__from_id",
+                "kind": "str",
+                "name": "from_id",
+                "none": true,
+                "store": "from_id"
+            },
+            {
+                "inject": "what__relations__bolt__id",
+                "kind": "str",
+                "name": "part_of_id",
+                "none": true,
+                "store": "part_of_id"
+            }
+        ],
+        "id": "id",
+        "index": {},
+        "name": "bolt",
+        "schema": "lightning",
+        "slug": "name",
+        "source": "lightning",
+        "store": "bolt",
+        "title": "Bolt",
+        "unique": {}
+    },
+    "forecast": {
+        "fields": [
+            {
+                "auto": false,
+                "kind": "str",
+                "name": "id",
+                "none": false,
+                "readonly": true,
+                "store": "id"
+            },
+            {
+                "default": 1,
+                "kind": "int",
+                "name": "version",
+                "none": false,
+                "store": "version"
+            },
+            {
+                "kind": "str",
+                "name": "home",
+                "none": false,
+                "store": "home"
+            },
+            {
+                "kind": "str",
+                "name": "entity_id",
+                "none": true,
+                "store": "entity_id"
+            },
+            {
+                "kind": "str",
+                "name": "name",
+                "none": true,
+                "store": "name"
+            },
+            {
+                "kind": "str",
+                "name": "description",
+                "none": true,
+                "store": "description"
+            },
+            {
+                "kind": "dict",
+                "name": "what",
+                "none": false,
+                "store": "what"
+            },
+            {
+                "inject": "what__relations__bolt__id",
+                "kind": "str",
+                "name": "bolt_id",
+                "none": true,
+                "store": "bolt_id"
+            }
+        ],
+        "id": "id",
+        "index": {},
+        "name": "forecast",
+        "schema": "lightning",
+        "slug": "name",
+        "source": "lightning",
+        "store": "forecast",
+        "title": "Forecast",
+        "unique": {}
+    },
+    "forecast_scat": {
+        "fields": [
+            {
+                "auto": false,
+                "kind": "str",
+                "name": "id",
+                "none": false,
+                "readonly": true,
+                "store": "id"
+            },
+            {
+                "kind": "str",
+                "name": "forecast_id",
+                "none": true,
+                "store": "forecast_id"
+            },
+            {
+                "kind": "str",
+                "name": "scat_id",
+                "none": true,
+                "store": "scat_id"
+            },
+            {
+                "default": 1,
+                "kind": "int",
+                "name": "version",
+                "none": false,
+                "store": "version"
+            },
+            {
+                "kind": "str",
+                "name": "home",
+                "none": false,
+                "store": "home"
+            },
+            {
+                "kind": "dict",
+                "name": "what",
+                "none": false,
+                "store": "what"
+            }
+        ],
+        "id": "id",
+        "index": {},
+        "name": "forecast_scat",
+        "schema": "lightning",
+        "source": "lightning",
+        "store": "forecast_scat",
+        "title": "ForecastScat",
+        "unique": {
+            "forecast_id-scat_id": [
+                "forecast_id",
+                "scat_id"
+            ]
+        }
+    },
+    "rod": {
+        "fields": [
+            {
+                "auto": false,
+                "kind": "str",
+                "name": "id",
+                "none": false,
+                "readonly": true,
+                "store": "id"
+            },
+            {
+                "default": 1,
+                "kind": "int",
+                "name": "version",
+                "none": false,
+                "store": "version"
+            },
+            {
+                "kind": "str",
+                "name": "home",
+                "none": false,
+                "store": "home"
+            },
+            {
+                "kind": "str",
+                "name": "entity_id",
+                "none": true,
+                "store": "entity_id"
+            },
+            {
+                "kind": "str",
+                "name": "name",
+                "none": true,
+                "store": "name"
+            },
+            {
+                "kind": "dict",
+                "name": "selection",
+                "none": false,
+                "store": "selection"
+            },
+            {
+                "kind": "dict",
+                "name": "act",
+                "none": false,
+                "store": "act"
+            },
+            {
+                "kind": "dict",
+                "name": "input",
+                "none": false,
+                "store": "input"
+            },
+            {
+                "kind": "dict",
+                "name": "what",
+                "none": false,
+                "store": "what"
+            }
+        ],
+        "id": "id",
+        "index": {},
+        "name": "rod",
+        "schema": "lightning",
+        "slug": "name",
+        "source": "lightning",
+        "store": "rod",
+        "title": "Rod",
+        "unique": {}
+    },
+    "strike": {
+        "fields": [
+            {
+                "auto": false,
+                "kind": "str",
+                "name": "id",
+                "none": false,
+                "readonly": true,
+                "store": "id"
+            },
+            {
+                "default": 1,
+                "kind": "int",
+                "name": "version",
+                "none": false,
+                "store": "version"
+            },
+            {
+                "kind": "str",
+                "name": "home",
+                "none": false,
+                "store": "home"
+            },
+            {
+                "kind": "str",
+                "name": "entity_id",
+                "none": true,
+                "store": "entity_id"
+            },
+            {
+                "kind": "str",
+                "name": "description",
+                "none": true,
+                "store": "description"
+            },
+            {
+                "default": "created",
+                "kind": "str",
+                "name": "state",
+                "none": false,
+                "options": [
+                    "created",
+                    "in progress",
+                    "done"
+                ],
+                "store": "state"
+            },
+            {
+                "kind": "dict",
+                "name": "what",
+                "none": false,
+                "store": "what"
+            },
+            {
+                "inject": "what__relations__bolt__id",
+                "kind": "str",
+                "name": "bolt_id",
+                "none": true,
+                "store": "bolt_id"
+            },
+            {
+                "inject": "what__relations__rod__id",
+                "kind": "str",
+                "name": "rod_id",
+                "none": true,
+                "store": "rod_id"
+            }
+        ],
+        "id": "id",
+        "index": {},
+        "name": "strike",
+        "schema": "lightning",
+        "source": "lightning",
+        "store": "strike",
+        "title": "Strike",
+        "unique": {}
+    },
+    "strike_scat": {
+        "fields": [
+            {
+                "auto": false,
+                "kind": "str",
+                "name": "id",
+                "none": false,
+                "readonly": true,
+                "store": "id"
+            },
+            {
+                "kind": "str",
+                "name": "strike_id",
+                "none": true,
+                "store": "strike_id"
+            },
+            {
+                "kind": "str",
+                "name": "scat_id",
+                "none": true,
+                "store": "scat_id"
+            },
+            {
+                "default": 1,
+                "kind": "int",
+                "name": "version",
+                "none": false,
+                "store": "version"
+            },
+            {
+                "kind": "str",
+                "name": "home",
+                "none": false,
+                "store": "home"
+            },
+            {
+                "kind": "dict",
+                "name": "what",
+                "none": false,
+                "store": "what"
+            }
+        ],
+        "id": "id",
+        "index": {},
+        "name": "strike_scat",
+        "schema": "lightning",
+        "source": "lightning",
+        "store": "strike_scat",
+        "title": "StrikeScat",
+        "unique": {
+            "strike_id-scat_id": [
+                "strike_id",
+                "scat_id"
+            ]
+        }
+    }
+}
